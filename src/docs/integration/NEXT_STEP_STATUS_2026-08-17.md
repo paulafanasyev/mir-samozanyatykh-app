@@ -15,6 +15,6 @@
 - Frontend production build is not verified because dependencies are not installed and network/DNS is unavailable.
 
 ## External references checked
-- Three.js 0.179.1 is a real published npm version. 
-- GLTFLoader is included in the `three` package; the separate `three-gltf-loader` package is deprecated.
-- Current `webview_flutter` is 4.14.1; it supports Android/iOS and documents Android SDK 24+ / iOS 13+, with Flutter 3.38 / Dart 3.10 minimums for 4.14.x.
+- Three.js 0.179.1 is a real published npm version. citeturn0search15
+- GLTFLoader is included in the `three` package; the separate `three-gltf-loader` package is deprecated. citeturn0search13turn0search14
+- Current `webview_flutter` is 4.14.1; it supports Android/iOS and documents Android SDK 24+ / iOS 13+, with Flutter 3.38 / Dart 3.10 minimums for 4.14.x. citeturn0search0turn0search1
