@@ -5,6 +5,7 @@ ANO TsPS INN 9724016805
 
 import re
 import html
+from typing import Optional
 
 
 def sanitize_html(text: str) -> str:
