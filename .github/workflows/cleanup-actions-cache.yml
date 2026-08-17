@@ -1,0 +1,25 @@
+name: Cleanup Actions caches
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete all repository Actions caches
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh cache list --limit 1000 --json id --jq '.[].id' | while read -r id; do
+            [ -n "$id" ] && gh cache delete "$id" --confirm
+          done
+          echo 'Actions cache cleanup completed.'
