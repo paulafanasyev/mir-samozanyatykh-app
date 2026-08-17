@@ -10,6 +10,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
+from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
 from app.core.config import settings
@@ -55,7 +56,7 @@ app = FastAPI(
 )
 
 app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, lambda request, exc: JSONResponse(status_code=429, content={"detail": "Rate limit exceeded"}))
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
     CORSMiddleware,
@@ -122,12 +123,12 @@ async def request_logging(request: Request, call_next):
                    "user_agent": request.headers.get("user-agent", "")[:100]},
         )
         return response
-    except Exception:
+    except Exception as e:
         duration = (time.time() - start_time) * 1000
         logger.error(
             f"{request.method} {request.url.path} ERROR {duration:.2f}ms",
             extra={"method": request.method, "path": request.url.path,
-                   "error_type": "request_exception", "ip_address": request.client.host},
+                   "error_type": type(e).__name__, "ip_address": request.client.host},
         )
         raise
 
