@@ -1,0 +1,34 @@
+name: Asset integrity
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+      - name: Verify no LFS pointer is used as a runtime asset
+        shell: bash
+        run: |
+          set -euo pipefail
+          if find . -type f \( -name '*.glb' -o -name '*.wav' -o -name '*.mp3' \) -print0 | xargs -0 -r grep -Il '^version https://git-lfs.github.com/spec/v1$' | grep -q .; then
+            echo 'A required binary asset is still an unresolved Git LFS pointer.'
+            exit 1
+          fi
+      - name: Report Svetlana model hash when present
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -f model_base.glb ]; then
+            sha256sum model_base.glb
+          else
+            echo 'model_base.glb is not present in the repository yet; migration remains incomplete.'
+          fi
