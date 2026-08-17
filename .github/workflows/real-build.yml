@@ -8,6 +8,8 @@ on:
 
 permissions:
   contents: read
+  id-token: write
+  attestations: write
 
 concurrency:
   group: real-build-${{ github.ref }}
@@ -19,6 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          lfs: true
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -37,6 +41,8 @@ jobs:
     needs: backend
     steps:
       - uses: actions/checkout@v4
+        with:
+          lfs: true
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -54,6 +60,10 @@ jobs:
           name: web-dist-${{ github.sha }}
           path: frontend/dist
           if-no-files-found: error
+      - name: Attest web artifact
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: frontend/dist/**
 
   android:
     name: Android release build
@@ -65,24 +75,33 @@ jobs:
           lfs: true
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.29.3'
+          flutter-version: '3.44.0'
           channel: stable
           cache: true
+      - name: Flutter version
+        run: flutter --version
       - name: Dependencies
         working-directory: mobile
         run: flutter pub get
       - name: Analyze
         working-directory: mobile
         run: flutter analyze
+      - name: Tests
+        working-directory: mobile
+        run: flutter test
       - name: Build APK
         working-directory: mobile
-        run: flutter build apk --release
+        run: flutter build apk --release --flavor prod
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: android-apk-${{ github.sha }}
-          path: mobile/build/app/outputs/flutter-apk/app-release.apk
+          path: mobile/build/app/outputs/flutter-apk/app-prod-release.apk
           if-no-files-found: error
+      - name: Attest APK
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: mobile/build/app/outputs/flutter-apk/app-prod-release.apk
 
   ios:
     name: iOS release build
@@ -94,7 +113,7 @@ jobs:
           lfs: true
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.29.3'
+          flutter-version: '3.44.0'
           channel: stable
           cache: true
       - name: Dependencies
@@ -103,6 +122,9 @@ jobs:
       - name: Analyze
         working-directory: mobile
         run: flutter analyze
+      - name: Tests
+        working-directory: mobile
+        run: flutter test
       - name: Build iOS without signing
         working-directory: mobile
         run: flutter build ios --release --no-codesign
