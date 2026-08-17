@@ -92,25 +92,18 @@ async def security_headers(request: Request, call_next):
     start_time = time.time()
     response = await call_next(request)
     duration = (time.time() - start_time) * 1000
-
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=()"
     if settings.ENVIRONMENT == "production":
         response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload"
-
-    # All frontend resources are local; no CDN is permitted by the production CSP.
-    csp = (
-        f"default-src 'self'; "
-        f"script-src 'self' 'nonce-{nonce}'; "
-        f"style-src 'self' 'nonce-{nonce}'; "
-        f"font-src 'self'; "
-        f"img-src 'self' data: https:; "
+    response.headers["Content-Security-Policy"] = (
+        f"default-src 'self'; script-src 'self' 'nonce-{nonce}'; "
+        f"style-src 'self' 'nonce-{nonce}'; font-src 'self'; img-src 'self' data: https:; "
         f"connect-src 'self' https://api.openrouter.ai https://api.yookassa.ru; "
         f"frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
     )
-    response.headers["Content-Security-Policy"] = csp
     response.headers["X-Response-Time"] = f"{duration:.2f}ms"
     return response
 
@@ -129,29 +122,34 @@ async def request_logging(request: Request, call_next):
                    "user_agent": request.headers.get("user-agent", "")[:100]},
         )
         return response
-    except Exception as e:
+    except Exception:
         duration = (time.time() - start_time) * 1000
         logger.error(
             f"{request.method} {request.url.path} ERROR {duration:.2f}ms",
             extra={"method": request.method, "path": request.url.path,
-                   "error_type": type(e).__name__, "ip_address": request.client.host},
+                   "error_type": "request_exception", "ip_address": request.client.host},
         )
         raise
 
 
-for router in (
+for _router in [
     auth.router, users.router, sales.router, contracts.router, crm.router, svetlana.router,
     websocket.router, subscriptions.router, flutter.router, email_campaigns.router, analytics.router,
     import_export.router, search.router, calendar.router, notifications.router, webrtc.router,
     ai_analytics.router, white_label.router, mfa.router, telegram_bot.router, api_keys.router,
     webhooks.router, whatsapp.router, reports.router, backups.router, health.router, admin.router,
-    referrals.router, tasks.router, export.router, import_data.router, accounting.router, fns.router,
-    bank.router, metrics.router, html_router,
-):
-    app.include_router(router)
+    referrals.router, tasks.router, export.router, import_data.router, accounting.router,
+    fns.router, bank.router, metrics.router, html_router,
+]:
+    app.include_router(_router)
 
 
 @app.get("/")
 @limiter.limit("10/minute")
 async def root(request: Request):
-    return {"app": settings.APP_NAME, "version": settings.APP_VERSION, "status": "running", "environment": settings.ENVIRONMENT}
+    return {
+        "app": settings.APP_NAME,
+        "version": settings.APP_VERSION,
+        "status": "running",
+        "environment": settings.ENVIRONMENT,
+    }
