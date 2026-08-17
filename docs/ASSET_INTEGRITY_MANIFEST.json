@@ -1,0 +1,28 @@
+{
+  "source_archive_sha256": "f6121450189d52afd4a86fcffc69e332db657de8ac41c2df0f7f567f51fde738",
+  "source_file_count": 414,
+  "source_unpacked_bytes": 136135193,
+  "svetlana": {
+    "web_model": {
+      "path": "frontend/public/svetlana/model_base.glb",
+      "bytes": 43580292,
+      "sha256": "9a65654d5de83f73201f9577b3fb44478d7ef6d0412b81c2467724a4de1151f5"
+    },
+    "mobile_model": {
+      "path": "mobile/assets/svetlana/model_base.glb",
+      "bytes": 43580292,
+      "sha256": "9a65654d5de83f73201f9577b3fb44478d7ef6d0412b81c2467724a4de1151f5"
+    },
+    "web_tts": {
+      "path": "frontend/public/svetlana/assets/svetlana_tts_smoke_test.wav",
+      "bytes": 152426,
+      "sha256": "e69cfa850489b6f77007c9ef0882604729d45cd65a669cb0162416dace3289bc"
+    },
+    "mobile_tts": {
+      "path": "mobile/assets/svetlana/assets/svetlana_tts_smoke_test.wav",
+      "bytes": 152426,
+      "sha256": "e69cfa850489b6f77007c9ef0882604729d45cd65a669cb0162416dace3289bc"
+    }
+  },
+  "status": "source_of_truth_manifest_only"
+}
