@@ -1,0 +1,8 @@
+{
+  "source_archive": "mir-samozanyatykh-SVETLANA-v13-NEXT7.zip",
+  "source_file_count": 529,
+  "source_total_bytes": 136135193,
+  "source_archive_sha256": "f6121450189d52afd4a86fcffc69e332db657de8ac41c2df0f7f567f51fde738",
+  "svetlana_model_sha256": "9a65654d5de83f73201f9577b3fb44478d7ef6d0412b81c2467724a4de1151f5",
+  "policy": "Every migrated file must preserve its source SHA-256. Binary assets must not be replaced by placeholders."
+}
